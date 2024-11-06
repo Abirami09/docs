@@ -1,94 +1,315 @@
 {
-  "openapi": "3.0.1",
+  "openapi": "3.1.0",
   "info": {
-    "title": "OpenAPI Plant Store",
-    "description": "A sample API that uses a plant store as an example to demonstrate features in the OpenAPI specification",
+    "title": "Catalogix API",
+    "description": "\n\u003Cbr\u003E API documentation for Catalogix services. \u003Cbr\u003E\n**Base URL:** `https://api.catalogix.ai` \u003Cbr\u003E\nUse this base URL to access all API endpoints.\n\n# Introduction\nOur suite of headless APIs enable end to end management of your fashion store. If you have any questions, please do not hesitate to contact us at support@catalogix.ai\n\n# Getting Started\n\nIn Catalogix Headless Platform, your company or organization is treated as a Workspace. Within the workspace, a store is defined as a channel for selling your products. Stores can be an eCommerce website in a specific country, a mobile app, a printed catalog, a chatbot, a 3rd party marketplace, or even physical retail locations. \n\nOnce you share your store's product feed or product images with Catalogix via our Feed API or using a CSV/XML file, we process your catalog and enable our APIs and services for your store.\n\n# Authentication\n\n\u003C!-- ReDoc-Inject: \u003Csecurity-definitions\u003E --\u003E\n\nCatalogix's REST APIs use the API Key to authenticate and authorize calls. Follow the steps listed here to get started.\n\n\u003Ch3\u003E Step 1: Registering your store and getting API Key \u003C/h3\u003E\n\nCatalogix will register your store and provide you a API Key. Please reach out to support@catalogix.ai to get started.\n\n    \n\u003Cbr/\u003E\n\n\u003Ch3\u003E Step 2: Calling an API \u003C/h3\u003E\nYou can call any API included in your subscription using the generated API Key.\n\nPass the API Key in the header as follows:\n\napikey: {token}\n\n\u003Ch4\u003EYou can use the same API Key for all APIs.\u003C/h4\u003E\n\n# Errors\nCatalogix Platform uses HTTP status codes to indicate success or failure of an API call. In general, status codes in the 2xx range means success, 4xx range means there was an error in the provided information, and those in the 5xx range indicate server side errors. Commonly used HTTP status codes are listed below.\n\n|Status Code | Description  |\n|--|--|\n| `200` | **Success**: The request was successfully completed. |\n| `201` | **Created**: The request was a success and one or more resources have been created. |\n| `400` | **Bad request**: The request cannot be performed. Usually because of malformed parameter or missing parameter. |\n| `401` | **Unauthorized (Invalid AuthToken)**: Request was rejected because of invalid API Key |\n| `404` | **Resource Not Found**: The URL youʼve sent is wrong. Itʼs possible that the resource youʼve requested has been moved to another URL. |\n| `405` |**Method Not Found**: The HTTP method that the API is calling with is not supported for this API. |\n| `413` |**Payload too large**: The API accepts upto 100 data items at a time. |\n| `422` |**validation Error**: It failed validation. Please refer to the data format given in the description of each API |\n| `429` | **Too many requests**: Too many requests within a certain time frame. To know more about api call limits, click here. |\n| `500` | **Server error**: Catalogix Platform server encountered an error which prevents it from fulfilling the request. Although this rarely happens, we recommend you to contact us at support@catalogix.ai if you receive this error. |\n\nFor details about the structure and application-specific error-codes of a specific Catalogix service, consult the documentation dedicated to that service.\n\n# Product Information\n\n\u003Ch3\u003EWhat is a Product? \u003C/h3\u003E\n\u003Cp\u003EA product is a uniquely identified item in a store catalog which can be sold to customers. A product typically contains information such as an identifier (eg: SKU, Style Code, GTIN), a title, a description, images, brand name, price, sale price, and other such attributes.  \u003C/p\u003E\n\n\u003Ch3\u003EWhere can it be implemented? \u003C/h3\u003E\n\u003Cp\u003EThe APIs shown in the section below help you to create new products in the Catalogix platform, modify existing product information, and fetch product information which can be used in many ways such as populating the content of a Product Details Page.  \u003C/p\u003E\n",
+    "contact": {
+      "name": "Catalogix Support",
+      "email": "support@catalogix.ai"
+    },
     "license": {
-      "name": "MIT"
+      "name": "Catalogix License"
     },
     "version": "1.0.0"
   },
   "servers": [
     {
-      "url": "http://sandbox.mintlify.com"
-    }
-  ],
-  "security": [
-    {
-      "bearerAuth": []
+      "url": "https://api.catalogix.ai/v1",
+      "description": "Catalogix APIs"
     }
   ],
   "paths": {
-    "/plants": {
-      "get": {
-        "description": "Returns all plants from the system that the user has access to",
+    "/products": {
+      "post": {
+        "tags": [
+          "Product APIs"
+        ],
+        "summary": "Insert Product Data",
+        "description": "Inserts new product data into the system.",
+        "operationId": "insert_data_products_post",
         "parameters": [
           {
-            "name": "limit",
+            "name": "store_uuid",
             "in": "query",
-            "description": "The maximum number of results to return",
+            "required": true,
             "schema": {
-              "type": "integer",
-              "format": "int32"
+              "type": "string",
+              "title": "Store Uuid"
+            }
+          },
+          {
+            "name": "apikey",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Apikey"
             }
           }
         ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/SkuDataModel"
+                },
+                "title": "Data"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
-            "description": "Plant response",
+            "description": "Insert successful",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Plant"
-                  }
+                  "$ref": "#/components/schemas/InsertDataResponse"
                 }
               }
             }
           },
           "400": {
-            "description": "Unexpected error",
+            "description": "Invalid data format",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "$ref": "#/components/schemas/ErrorResponseModel"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Payload too large",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Mapping profile not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseModel"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
           }
         }
       },
-      "post": {
-        "description": "Creates a new plant in the store",
+      "put": {
+        "tags": [
+          "Product APIs"
+        ],
+        "summary": "Update Product Data",
+        "description": "Updates existing product data.",
+        "operationId": "update_data_products_put",
+        "parameters": [
+          {
+            "name": "store_uuid",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Store Uuid"
+            }
+          },
+          {
+            "name": "apikey",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Apikey"
+            }
+          }
+        ],
         "requestBody": {
-          "description": "Plant to add to the store",
+          "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewPlant"
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/UpdateSkuDataModel"
+                },
+                "title": "Data"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
-            "description": "plant response",
+            "description": "Update successful",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Plant"
+                  "$ref": "#/components/schemas/UpdateDataResponse"
                 }
               }
             }
           },
           "400": {
-            "description": "unexpected error",
+            "description": "Invalid data format",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "$ref": "#/components/schemas/ErrorResponseModel"
+                }
+              }
+            }
+          },
+          "413": {
+            "description": "Payload too large",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Mapping profile not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseModel"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Product APIs"
+        ],
+        "summary": "Retrieve Product Data",
+        "description": "Retrieves product data.",
+        "operationId": "retrieve_product_data_products_get",
+        "parameters": [
+          {
+            "name": "store_uuid",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Store Uuid"
+            }
+          },
+          {
+            "name": "marketplace",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "SMP",
+              "title": "Marketplace"
+            }
+          },
+          {
+            "name": "retrieval_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "default",
+                "all"
+              ],
+              "type": "string",
+              "default": "default",
+              "title": "Retrieval Type"
+            }
+          },
+          {
+            "name": "sku_codes",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "List of SKU Codes or Style codes based on selected type to be retrieved",
+              "title": "Sku Codes"
+            },
+            "description": "List of SKU Codes or Style codes based on selected type to be retrieved"
+          },
+          {
+            "name": "apikey",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Apikey"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Data retrieval successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetrieveDataResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid data format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Data not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseModel"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
                 }
               }
             }
@@ -96,32 +317,243 @@
         }
       }
     },
-    "/plants/{id}": {
-      "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
+    "/products/status": {
+      "get": {
+        "tags": [
+          "Product APIs"
+        ],
+        "summary": "Retrieve Product Data based on Status",
+        "description": "Retrieves product data based on status.",
+        "operationId": "retrieve_data_on_status_products_status_get",
         "parameters": [
           {
-            "name": "id",
-            "in": "path",
-            "description": "ID of plant to delete",
+            "name": "store_uuid",
+            "in": "query",
             "required": true,
             "schema": {
+              "type": "string",
+              "title": "Store Uuid"
+            }
+          },
+          {
+            "name": "marketplace",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "SMP",
+              "title": "Marketplace"
+            }
+          },
+          {
+            "name": "retrieval_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "default",
+                "all"
+              ],
+              "type": "string",
+              "default": "default",
+              "title": "Retrieval Type"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "new",
+                "active",
+                "problem",
+                "inactive",
+                "draft",
+                "under review"
+              ],
+              "type": "string",
+              "default": "active",
+              "title": "Status"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
               "type": "integer",
-              "format": "int64"
+              "minimum": 0,
+              "default": 0,
+              "title": "Offset"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "exclusiveMinimum": 0,
+              "default": 100,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "apikey",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Apikey"
             }
           }
         ],
         "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
-          },
-          "400": {
-            "description": "unexpected error",
+          "200": {
+            "description": "Data retrieval successful",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "$ref": "#/components/schemas/RetrieveDataResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid data format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Data not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseModel"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/products/delete": {
+      "delete": {
+        "tags": [
+          "Product APIs"
+        ],
+        "summary": "Delete Product Data",
+        "description": "Delete product data",
+        "operationId": "delete_data_products_delete_delete",
+        "parameters": [
+          {
+            "name": "store_uuid",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Store Uuid"
+            }
+          },
+          {
+            "name": "sku_codes",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "List of SKU Codes needs to be deleted",
+              "title": "Sku Codes"
+            },
+            "description": "List of SKU Codes needs to be deleted"
+          },
+          {
+            "name": "apikey",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Apikey"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Data deletion successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteDataResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid data format",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseModel"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Data not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponseModel"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rate-limit-info": {
+      "get": {
+        "tags": [
+          "API Information"
+        ],
+        "summary": "Rate Limiting Info",
+        "description": "rate_limit: 20 requests per minute  \nExceeding this limit will result in a 429 Too Many Requests error.",
+        "operationId": "rate_limit_info_rate_limit_info_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+
                 }
               }
             }
@@ -132,63 +564,472 @@
   },
   "components": {
     "schemas": {
-      "Plant": {
-        "required": [
-          "name"
-        ],
-        "type": "object",
+      "DeleteDataResponse": {
         "properties": {
-          "name": {
-            "description": "The name of the plant",
-            "type": "string"
-          },
-          "tag": {
-            "description": "Tag to specify the type",
-            "type": "string"
-          }
-        }
-      },
-      "NewPlant": {
-        "allOf": [
-          {
-            "$ref": "#/components/schemas/Plant"
-          },
-          {
-            "required": [
-              "id"
-            ],
-            "type": "object",
-            "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/StatusModel"
               }
-            }
+            ],
+            "description": "Status of the operation, including code and message"
           }
-        ]
-      },
-      "Error": {
-        "required": [
-          "error",
-          "message"
-        ],
+        },
         "type": "object",
+        "required": [
+          "status"
+        ],
+        "title": "DeleteDataResponse"
+      },
+      "ErrorResponseModel": {
         "properties": {
-          "error": {
+          "status": {
+            "type": "string",
+            "title": "Status",
+            "description": "The status of the request, typically 'error'",
+            "default": "error"
+          },
+          "detail": {
+            "type": "string",
+            "title": "Detail",
+            "description": "A description of the error"
+          }
+        },
+        "type": "object",
+        "required": [
+          "detail"
+        ],
+        "title": "ErrorResponseModel"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "InsertData": {
+        "properties": {
+          "store_uuid": {
+            "type": "string",
+            "title": "Store Uuid",
+            "description": "Unique identifier for the store"
+          },
+          "response": {
+            "items": {
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Response"
+          },
+          "product_already_exists": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Product Already Exists",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "store_uuid",
+          "response"
+        ],
+        "title": "InsertData"
+      },
+      "InsertDataResponse": {
+        "properties": {
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/StatusModel"
+              }
+            ],
+            "description": "Status of the operation"
+          },
+          "data": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/InsertData"
+              }
+            ],
+            "description": "Information related to insertion of each SKU Code"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "data"
+        ],
+        "title": "InsertDataResponse"
+      },
+      "RetrieveDataModel": {
+        "properties": {
+          "store_uuid": {
+            "type": "string",
+            "title": "Store Uuid",
+            "description": "Unique identifier for the store"
+          },
+          "marketplace": {
+            "type": "string",
+            "title": "Marketplace",
+            "description": "Name of the source marketplace data is retrieved from"
+          },
+          "data": {
+            "items": {
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Data",
+            "description": "List of data entries associated with the SKUs",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "store_uuid",
+          "marketplace"
+        ],
+        "title": "RetrieveDataModel"
+      },
+      "RetrieveDataResponse": {
+        "properties": {
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/StatusModel"
+              }
+            ],
+            "description": "Status of the operation, including code and message"
+          },
+          "data": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RetrieveDataModel"
+              }
+            ],
+            "description": "Data including store UUID, marketplace, and associated SKU data"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "data"
+        ],
+        "title": "RetrieveDataResponse"
+      },
+      "SkuDataModel": {
+        "properties": {
+          "SKU Code": {
+            "type": "string",
+            "title": "Sku Code",
+            "description": "Unique identifier for the product"
+          },
+          "Style Code": {
+            "type": "string",
+            "title": "Style Code",
+            "description": "Style Code of the product. Style Code contains multiple SKU Codes"
+          },
+          "Product Name": {
+            "type": "string",
+            "title": "Product Name",
+            "description": "Product Name/Title"
+          },
+          "Selling Price": {
+            "type": "string",
+            "title": "Selling Price",
+            "description": "Selling Price"
+          },
+          "Currency": {
+            "type": "string",
+            "title": "Currency",
+            "description": "Currency"
+          },
+          "Image URL 1": {
+            "type": "string",
+            "title": "Image Url 1",
+            "description": "Image URL 1"
+          },
+          "Image URL 2": {
+            "type": "string",
+            "title": "Image Url 2",
+            "description": "Image URL 2"
+          },
+          "Image URL 3": {
+            "type": "string",
+            "title": "Image Url 3",
+            "description": "Image URL 3"
+          },
+          "Image URL 4": {
+            "type": "string",
+            "title": "Image Url 4",
+            "description": "Image URL 4"
+          },
+          "Image URL 5": {
+            "type": "string",
+            "title": "Image Url 5",
+            "description": "Image URL 5"
+          },
+          "Image URL 6": {
+            "type": "string",
+            "title": "Image Url 6",
+            "description": "Image URL 6"
+          },
+          "Image URL 7": {
+            "type": "string",
+            "title": "Image Url 7",
+            "description": "Image URL 7"
+          },
+          "Image URL 8": {
+            "type": "string",
+            "title": "Image Url 8",
+            "description": "Image URL 8"
+          },
+          "Image URL 9": {
+            "type": "string",
+            "title": "Image Url 9",
+            "description": "Image URL 9"
+          },
+          "Image URL 10": {
+            "type": "string",
+            "title": "Image Url 10",
+            "description": "Image URL 10"
+          },
+          "Image URL 11": {
+            "type": "string",
+            "title": "Image Url 11",
+            "description": "Image URL 11"
+          },
+          "Image URL 12": {
+            "type": "string",
+            "title": "Image Url 12",
+            "description": "Image URL 12"
+          },
+          "Image URL 13": {
+            "type": "string",
+            "title": "Image Url 13",
+            "description": "Image URL 13"
+          },
+          "Image URL 14": {
+            "type": "string",
+            "title": "Image Url 14",
+            "description": "Image URL 14"
+          },
+          "Image URL 15": {
+            "type": "string",
+            "title": "Image Url 15",
+            "description": "Image URL 15"
+          },
+          "Image URL 16": {
+            "type": "string",
+            "title": "Image Url 16",
+            "description": "Image URL 16"
+          },
+          "Image URL 17": {
+            "type": "string",
+            "title": "Image Url 17",
+            "description": "Image URL 17"
+          },
+          "Image URL 18": {
+            "type": "string",
+            "title": "Image Url 18",
+            "description": "Image URL 18"
+          },
+          "Image URL 19": {
+            "type": "string",
+            "title": "Image Url 19",
+            "description": "Image URL 19"
+          },
+          "Image URL 20": {
+            "type": "string",
+            "title": "Image Url 20",
+            "description": "Image URL 20"
+          },
+          "Extra attribute 1": {
+            "type": "string",
+            "title": "Extra Attribute 1",
+            "description": "Extra attribute 1"
+          },
+          "Extra attribute 2": {
+            "type": "string",
+            "title": "Extra Attribute 2",
+            "description": "Extra attribute 1"
+          },
+          "Extra attribute 3": {
+            "type": "string",
+            "title": "Extra Attribute 3",
+            "description": "Extra attribute 1"
+          },
+          "Extra attribute 4": {
+            "type": "string",
+            "title": "Extra Attribute 4",
+            "description": "Extra attribute 1"
+          },
+          "Extra attribute 5": {
+            "type": "string",
+            "title": "Extra Attribute 5",
+            "description": "Extra attribute 1"
+          }
+        },
+        "type": "object",
+        "required": [
+          "SKU Code"
+        ],
+        "title": "SkuDataModel"
+      },
+      "StatusModel": {
+        "properties": {
+          "code": {
             "type": "integer",
-            "format": "int32"
+            "title": "Code",
+            "description": "Status code of the operation. 1 means success. -1 means failure. 0 means process moved to background"
           },
           "message": {
-            "type": "string"
+            "type": "string",
+            "title": "Message",
+            "description": "Message describing the status"
           }
-        }
-      }
-    },
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer"
+        },
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "title": "StatusModel"
+      },
+      "UpdateDataModel": {
+        "properties": {
+          "store_uuid": {
+            "type": "string",
+            "title": "Store Uuid",
+            "description": "Unique identifier for the store"
+          },
+          "response": {
+            "items": {
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Response",
+            "description": "Response containing errors if any for SKU Code update"
+          },
+          "updated_skus": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Updated Skus",
+            "description": "List of SKUs that were successfully updated",
+            "default": []
+          },
+          "unavailable_skus": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Unavailable Skus",
+            "description": "List of SKUs that were unavailable for update",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "store_uuid",
+          "response"
+        ],
+        "title": "UpdateDataModel"
+      },
+      "UpdateDataResponse": {
+        "properties": {
+          "status": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/StatusModel"
+              }
+            ],
+            "description": "Status of the operation"
+          },
+          "data": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/UpdateDataModel"
+              }
+            ],
+            "description": "Data containing updated and unavailable SKUs"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "data"
+        ],
+        "title": "UpdateDataResponse"
+      },
+      "UpdateSkuDataModel": {
+        "properties": {
+          "SKU Code": {
+            "type": "string",
+            "title": "Sku Code",
+            "description": "Unique identifier for the product. Cannot be updated"
+          },
+          "Status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "problem"
+            ],
+            "title": "Status"
+          },
+          "Product Attribute": {
+            "type": "string",
+            "title": "Product Attribute",
+            "description": "Product attribute to be updated"
+          }
+        },
+        "type": "object",
+        "required": [
+          "SKU Code"
+        ],
+        "title": "UpdateSkuDataModel"
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
       }
     }
   }
