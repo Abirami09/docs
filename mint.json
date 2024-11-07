@@ -7,7 +7,7 @@
   },
   "api": {
     "baseUrl": "https://api.catalogix.ai/v1/",
-    "playground": {"mode": "show"}},
+    "playground": {"mode": "hide"}},
   "favicon": "/favicon.png",
   "colors": {
     "primary": "#0D9373",
